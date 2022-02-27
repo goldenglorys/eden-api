@@ -20,7 +20,6 @@ class WelcomeController extends Controller
      *     ),
      * )
      */
-
     public function index()
     {
         $response = [
