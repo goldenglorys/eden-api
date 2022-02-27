@@ -2,6 +2,14 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Eden Life",
+        "description": "Welcome to the Garden of Eden. it's new day, another opportunity to be a step closer to 'Paradise'!",
+        "contact": {
+            "email": "olusolagloryolamide@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "1.0.0"
     },
     "paths": {
@@ -44,6 +52,312 @@
                 "responses": {
                     "200": {
                         "description": "Success"
+                    }
+                }
+            }
+        },
+        "/api/v1/gardeners": {
+            "get": {
+                "tags": [
+                    "gardeners"
+                ],
+                "summary": "Display all Gardeners",
+                "description": "Get all gardeners",
+                "operationId": "gardeners",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "gardeners"
+                ],
+                "summary": "Register Gardeners",
+                "description": "Add a new gardener to the garden/system",
+                "operationId": "gardenerRegister",
+                "requestBody": {
+                    "description": "Pass gardeners details (Location-Area and Country must be code-name returned from each of their endpoint)",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "full_name",
+                                    "email",
+                                    "location_area",
+                                    "country_of_domicile"
+                                ],
+                                "properties": {
+                                    "full_name": {
+                                        "type": "string",
+                                        "example": "Firstname Lastname"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "gardener@mail.com"
+                                    },
+                                    "location_area": {
+                                        "type": "string",
+                                        "example": "LA"
+                                    },
+                                    "country_of_domicile": {
+                                        "type": "string",
+                                        "example": "NG"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "full_name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The full name field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                },
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The email field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                },
+                                                "location_area": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The location area field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                },
+                                                "country_of_domicile": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The country of domicile field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gardeners/{gardenerId}": {
+            "get": {
+                "tags": [
+                    "gardeners"
+                ],
+                "summary": "Gardener by id",
+                "description": "Get gardener by id",
+                "operationId": "gardenersById",
+                "parameters": [
+                    {
+                        "name": "gardenerId",
+                        "in": "path",
+                        "description": "ID of gardener",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+        "/api/v1/gardeners/{id}": {
+            "put": {
+                "tags": [
+                    "gardeners"
+                ],
+                "summary": "Update Existing Gardener",
+                "description": "Returns updated gardner data",
+                "operationId": "gardenerUpdate",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Gardener id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Pass gardeners details (Location-Area and Country must be code-name returned from each of their endpoint)",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "full_name",
+                                    "email",
+                                    "location_area",
+                                    "country_of_domicile"
+                                ],
+                                "properties": {
+                                    "full_name": {
+                                        "type": "string",
+                                        "example": "Firstname Lastname"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "gardener@mail.com"
+                                    },
+                                    "location_area": {
+                                        "type": "string",
+                                        "example": "LA"
+                                    },
+                                    "country_of_domicile": {
+                                        "type": "string",
+                                        "example": "NG"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "422": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "errors": {
+                                            "properties": {
+                                                "full_name": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The full name field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                },
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The email field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                },
+                                                "location_area": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The location area field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                },
+                                                "country_of_domicile": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": [
+                                                            "The country of domicile field is required."
+                                                        ]
+                                                    },
+                                                    "collectionFormat": "multi"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "gardeners"
+                ],
+                "summary": "Delete existing gardener",
+                "description": "Deletes a record and returns no content",
+                "operationId": "deleteGardener",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Gardener id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful operation"
                     }
                 }
             }

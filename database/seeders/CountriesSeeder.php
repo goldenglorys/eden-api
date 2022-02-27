@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\DB;
 class CountriesSeeder extends Seeder
 {
     public $seedData = [
-        ['name' => 'Nigeria', 'code' => 'NG'],
-        ['name' => 'Kenya', 'code' => 'KE'],
+        ['id' => 1, 'name' => 'Nigeria', 'code' => 'NG'],
+        ['id' => 2, 'name' => 'Kenya', 'code' => 'KE'],
     ];
 
     /**

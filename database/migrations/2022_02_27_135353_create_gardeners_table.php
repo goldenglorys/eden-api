@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('location_area');
             $table->unsignedBigInteger('country_of_domicile');
             $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable();
         });
     }
 

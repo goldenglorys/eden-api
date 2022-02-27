@@ -13,13 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('location_areas', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('code');
-            $table->unsignedBigInteger('country');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->nullable();
+        Schema::table('location_areas', function (Blueprint $table) {
+            $table->foreign('country')->references('id')
+                ->on('countries_of_domicile')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
@@ -30,6 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('location_areas');
+        Schema::table('location_areas', function (Blueprint $table) {
+            $table->dropForeign('location_areas_country_foreign');
+        });
     }
 };
