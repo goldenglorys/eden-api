@@ -1,0 +1,27 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Eden Life",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/": {
+            "get": {
+                "tags": [
+                    "welcome"
+                ],
+                "summary": "Welcome message",
+                "description": "Get welcome message",
+                "operationId": "welcome",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        }
+    },
+    "security": [
+        []
+    ]
+}
