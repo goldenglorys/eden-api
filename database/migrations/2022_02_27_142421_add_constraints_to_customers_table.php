@@ -18,6 +18,8 @@ return new class extends Migration
                 ->on('location_areas')->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreign('country_of_domicile')->references('id')
                 ->on('countries_of_domicile')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign('gardener')->references('id')
+                ->on('gardeners')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
@@ -31,6 +33,7 @@ return new class extends Migration
         Schema::table('customers', function (Blueprint $table) {
             $table->dropForeign('customers_location_area_foreign');
             $table->dropForeign('customers_countries_of_domicile_foreign');
+            $table->dropForeign('customers_gardener_foreign');
         });
     }
 };

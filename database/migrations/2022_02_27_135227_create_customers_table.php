@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->unsignedBigInteger('location_area');
             $table->unsignedBigInteger('country_of_domicile');
+            $table->unsignedBigInteger('gardener');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable();
         });
