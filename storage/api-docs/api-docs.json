@@ -801,21 +801,6 @@
                     }
                 }
             }
-        },
-        "/api/v1/": {
-            "get": {
-                "tags": [
-                    "welcome"
-                ],
-                "summary": "Welcome message",
-                "description": "Get welcome message",
-                "operationId": "welcome",
-                "responses": {
-                    "200": {
-                        "description": "Success"
-                    }
-                }
-            }
         }
     },
     "security": [
