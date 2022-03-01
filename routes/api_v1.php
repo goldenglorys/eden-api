@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\v1\WelcomeController;
 use App\Http\Controllers\API\v1\CountryController;
 use App\Http\Controllers\API\v1\GardenerController;
 use App\Http\Controllers\API\v1\CustomerController;
@@ -8,7 +9,7 @@ use App\Http\Controllers\API\v1\LocationAreaController;
 use App\Http\Controllers\API\v1\GardenersPerCountryController;
 
 
-Route::get('', 'App\Http\Controllers\API\v1\WelcomeController@index');
+Route::resource('', WelcomeController::class, ['only' => ['index']]);
 
 Route::resource('countries', CountryController::class, ['only' => ['index', 'show']]);
 
