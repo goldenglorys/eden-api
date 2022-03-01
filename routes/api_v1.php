@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\v1\CountryController;
-use App\Http\Controllers\APi\v1\GardenerController;
+use App\Http\Controllers\API\v1\GardenerController;
 use App\Http\Controllers\API\v1\CustomerController;
 use App\Http\Controllers\API\v1\LocationAreaController;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\APi\v1;
+namespace App\Http\Controllers\API\v1;
 
 use App\Models\Gardeners;
 use Illuminate\Http\Request;
