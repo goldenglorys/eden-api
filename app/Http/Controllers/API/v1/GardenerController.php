@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Database\QueryException;
-
+use Cache;
 
 class GardenerController extends Controller
 {
@@ -30,11 +30,16 @@ class GardenerController extends Controller
     public function index()
     {
         try {
+            if (Cache::has('allGardeners')) {
+                return Cache::get('allGardeners');
+            }
             $gardeners = Gardeners::with(['country', 'location'])->get();
-            return response()->json([
+            $allGardeners = response()->json([
                 'success' => true,
                 'data' => $gardeners,
             ], Response::HTTP_OK);
+            Cache::put('allGardeners', $allGardeners, 3);
+            return $allGardeners;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -70,11 +75,16 @@ class GardenerController extends Controller
     public function show($id)
     {
         try {
+            if (Cache::has('singleGardener')) {
+                return Cache::get('singleGardener');
+            }
             $gardener = Gardeners::with(['country', 'location'])->findorFail($id);
-            return response()->json([
+            $singleGardener = response()->json([
                 'success' => true,
                 'data' => $gardener,
             ], 200);
+            Cache::put('singleGardener', $singleGardener, 3);
+            return $singleGardener;
         } catch (\Exception $e) {
 
             return response()->json([

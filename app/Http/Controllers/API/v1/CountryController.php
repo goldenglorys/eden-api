@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\CountriesOfDomicile;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Cache;
 
 class CountryController extends Controller
 {
@@ -25,11 +26,16 @@ class CountryController extends Controller
     public function index()
     {
         try {
+            if (Cache::has('allCountries')) {
+                return Cache::get('allCountries');
+            }
             $countries = CountriesOfDomicile::all();
-            return response()->json([
+            $allCountries = response()->json([
                 'success' => true,
                 'data' => $countries,
             ], Response::HTTP_OK);
+            Cache::put('allCountries', $allCountries, 3);
+            return $allCountries;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -69,11 +75,16 @@ class CountryController extends Controller
     public function show($id)
     {
         try {
+            if (Cache::has('singleCountry')) {
+                return Cache::get('singleCountry');
+            }
             $country = CountriesOfDomicile::findorFail($id);
-            return response()->json([
+            $singleCountry = response()->json([
                 'success' => true,
                 'data' => $country,
             ], 200);
+            Cache::put('singleCountry', $singleCountry, 3);
+            return $singleCountry;
         } catch (\Exception $e) {
             if ($e instanceof ModelNotFoundException) {
                 return response()->json([

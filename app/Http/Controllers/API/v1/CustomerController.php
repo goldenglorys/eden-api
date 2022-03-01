@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Cache;
 
 class CustomerController extends Controller
 {
@@ -31,11 +32,16 @@ class CustomerController extends Controller
     public function index()
     {
         try {
+            if (Cache::has('allCustomers')) {
+                return Cache::get('allCustomers');
+            }
             $customers = Customers::with(['gardener', 'country', 'location'])->get();
-            return response()->json([
+            $allCustomers = response()->json([
                 'success' => true,
                 'data' => $customers,
             ], Response::HTTP_OK);
+            Cache::put('allCustomers', $allCustomers, 3);
+            return $allCustomers;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -75,11 +81,16 @@ class CustomerController extends Controller
     public function show($id)
     {
         try {
+            if (Cache::has('singleCustomer')) {
+                return Cache::get('singleCustomer');
+            }
             $customer = Customers::with(['gardener', 'country', 'location'])->findorFail($id);
-            return response()->json([
+            $singleCustomer = response()->json([
                 'success' => true,
                 'data' => $customer,
             ], 200);
+            Cache::put('singleCustomer', $singleCustomer, 3);
+            return $singleCustomer;
         } catch (\Exception $e) {
             if ($e instanceof ModelNotFoundException) {
                 return response()->json([

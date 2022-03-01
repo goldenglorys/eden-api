@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\LocationAreas;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Cache;
 
 class LocationAreaController extends Controller
 {
@@ -25,11 +26,16 @@ class LocationAreaController extends Controller
     public function index()
     {
         try {
+            if (Cache::has('allLocations')) {
+                return Cache::get('allLocations');
+            }
             $locationAreas = LocationAreas::with(['customers', 'country'])->get();
-            return response()->json([
+            $allLocations = response()->json([
                 'success' => true,
                 'data' => $locationAreas,
             ], Response::HTTP_OK);
+            Cache::put('allLocations', $allLocations, 3);
+            return $allLocations;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -69,12 +75,17 @@ class LocationAreaController extends Controller
     public function show($id)
     {
         try {
+            if (Cache::has('singleLocation')) {
+                return Cache::get('singleLocation');
+            }
             $locationArea = LocationAreas::with(['customers', 'country'])->where('location_areas.id', $id)->get();
             if ($locationArea->isEmpty()) throw new ModelNotFoundException;
-            return response()->json([
+            $singleLocation = response()->json([
                 'success' => true,
                 'data' => $locationArea,
             ], 200);
+            Cache::put('singleLocation', $singleLocation, 3);
+            return $singleLocation;
         } catch (\Exception $e) {
             if ($e instanceof ModelNotFoundException) {
                 return response()->json([

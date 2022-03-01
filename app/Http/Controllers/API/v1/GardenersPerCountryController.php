@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\CountriesOfDomicile;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Cache;
 
 class GardenersPerCountryController extends Controller
 {
@@ -25,6 +26,9 @@ class GardenersPerCountryController extends Controller
     public function index()
     {
         try {
+            if (Cache::has('allGardenersByCountries')) {
+                return Cache::get('allGardenersByCountries');
+            }
             $gardenersByCountries = CountriesOfDomicile::with('gardeners')->withCount('customers')->get();
             if (empty($gardenersByCountries)) {
                 return response()->json([
@@ -32,10 +36,12 @@ class GardenersPerCountryController extends Controller
                     'data' => $gardenersByCountries,
                 ], 404);
             }
-            return response()->json([
+            $allGardenersByCountries = response()->json([
                 'success' => true,
                 'data' => $gardenersByCountries,
             ], Response::HTTP_OK);
+            Cache::put('allGardenersByCountries', $allGardenersByCountries, 3);
+            return $allGardenersByCountries;
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -75,12 +81,17 @@ class GardenersPerCountryController extends Controller
     public function show($id)
     {
         try {
+            if (Cache::has('singleGardenerByCountries')) {
+                return Cache::get('singleGardenerByCountries');
+            }
             $gardenersByCountries = CountriesOfDomicile::with('gardeners')->withCount('customers')->where('countries_of_domicile.id', $id)->get();
             if ($gardenersByCountries->isEmpty()) throw new ModelNotFoundException;
-            return response()->json([
+            $singleGardenerByCountries = response()->json([
                 'success' => true,
                 'data' => $gardenersByCountries,
             ], 200);
+            Cache::put('singleGardenerByCountries', $singleGardenerByCountries, 3);
+            return $singleGardenerByCountries;
         } catch (\Exception $e) {
             if ($e instanceof ModelNotFoundException) {
                 return response()->json([
