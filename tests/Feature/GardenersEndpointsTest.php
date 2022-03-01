@@ -64,6 +64,26 @@ class GardenersEndpointsTest extends TestCase
             ]);
     }
 
+    public function testGetAllGardenersByCountry()
+    {
+        $this->get('/api/v1/gardenersByCountry')
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                "success",
+                "data"
+            ]);
+    }
+
+    public function testGetSingleGardenerByCountry()
+    {
+        $this->get('/api/v1/gardenersByCountry/1')
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                "success",
+                "data"
+            ]);
+    }
+
     public function testCanCreateGardener()
     {
         $response = $this->json(
