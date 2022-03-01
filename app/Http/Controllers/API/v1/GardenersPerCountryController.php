@@ -7,15 +7,15 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\CountriesOfDomicile;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class CountryController extends Controller
+class GardenersPerCountryController extends Controller
 {
     /**
      * @OA\Get(
-     * path="/api/v1/countries",
-     * summary="Display all Countries of Domicile",
-     * description="Get all countries",
+     * path="/api/v1/gardenersByCountry",
+     * summary="Display all gardeners per country and their respective numbers of customers they have each.",
+     * description="Get all gardeners per country and their respective numbers of  customers they have each",
      * operationId="countries",
-     * tags={"countries"},
+     * tags={"gardenersByCountry"},
      * @OA\Response(
      *    response=200,
      *    description="Success",
@@ -25,10 +25,16 @@ class CountryController extends Controller
     public function index()
     {
         try {
-            $countries = CountriesOfDomicile::all();
+            $gardenersByCountries = CountriesOfDomicile::with('gardeners')->withCount('customers')->get();
+            if (empty($gardenersByCountries)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $gardenersByCountries,
+                ], 404);
+            }
             return response()->json([
                 'success' => true,
-                'data' => $countries,
+                'data' => $gardenersByCountries,
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return response()->json([
@@ -40,11 +46,11 @@ class CountryController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/v1/countries/{countryId}",
-     * summary="Country of domicile by id",
-     * description="Get country by id",
+     * path="/api/v1/gardenersByCountry/{countryId}",
+     * summary="Country of domicile by id and gardeners per country and their respective numbers of  customers they have each",
+     * description="Get country by id and gardeners per country and their respective numbers of  customers they have each",
      * operationId="countriesById",
-     * tags={"countries"},
+     * tags={"gardenersByCountry"},
      * @OA\Parameter(
      *    description="ID of country",
      *    in="path",
@@ -62,17 +68,18 @@ class CountryController extends Controller
      *     ),
      * @OA\Response(
      *    response=404,
-     *    description="Country with given ID not found",
+     *    description="Gardener with given ID not found",
      *     ),
      * )
      */
     public function show($id)
     {
         try {
-            $country = CountriesOfDomicile::findorFail($id);
+            $gardenersByCountries = CountriesOfDomicile::with('gardeners')->withCount('customers')->where('countries_of_domicile.id', $id)->get();
+            if ($gardenersByCountries->isEmpty()) throw new ModelNotFoundException;
             return response()->json([
                 'success' => true,
-                'data' => $country,
+                'data' => $gardenersByCountries,
             ], 200);
         } catch (\Exception $e) {
             if ($e instanceof ModelNotFoundException) {

@@ -52,6 +52,9 @@
                 "responses": {
                     "200": {
                         "description": "Success"
+                    },
+                    "404": {
+                        "description": "Country with given ID not found"
                     }
                 }
             }
@@ -61,8 +64,8 @@
                 "tags": [
                     "customers"
                 ],
-                "summary": "Display all Customers",
-                "description": "Get all customers",
+                "summary": "Display all Customers and their respective gardener",
+                "description": "Get all customers and their respective gardener",
                 "operationId": "customers",
                 "responses": {
                     "200": {
@@ -119,6 +122,9 @@
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "406": {
+                        "description": "Not acceptable"
                     },
                     "422": {
                         "description": "Validation error",
@@ -189,12 +195,12 @@
                 "tags": [
                     "customers"
                 ],
-                "summary": "Customer by id",
-                "description": "Get customer by id",
+                "summary": "Customer by id and their gardener",
+                "description": "Get customer by id and their gardener",
                 "operationId": "customersById",
                 "parameters": [
                     {
-                        "name": "customersId",
+                        "name": "customerId",
                         "in": "path",
                         "description": "ID of customer",
                         "required": true,
@@ -208,6 +214,9 @@
                 "responses": {
                     "200": {
                         "description": "Success"
+                    },
+                    "404": {
+                        "description": "Customer with given ID not found"
                     }
                 }
             }
@@ -276,6 +285,12 @@
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "404": {
+                        "description": "Customer with given ID not found"
+                    },
+                    "406": {
+                        "description": "Not acceptable"
                     },
                     "422": {
                         "description": "Validation error",
@@ -370,6 +385,9 @@
                 "responses": {
                     "204": {
                         "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Customer with given ID not found"
                     }
                 }
             }
@@ -437,6 +455,9 @@
                     },
                     "400": {
                         "description": "Bad Request"
+                    },
+                    "406": {
+                        "description": "Not acceptable"
                     },
                     "422": {
                         "description": "Validation error",
@@ -592,6 +613,12 @@
                     "400": {
                         "description": "Bad Request"
                     },
+                    "404": {
+                        "description": "Gardener with given ID not found"
+                    },
+                    "406": {
+                        "description": "Not acceptable"
+                    },
                     "422": {
                         "description": "Validation error",
                         "content": {
@@ -676,6 +703,55 @@
                 "responses": {
                     "204": {
                         "description": "Successful operation"
+                    },
+                    "404": {
+                        "description": "Gardener with given ID not found"
+                    }
+                }
+            }
+        },
+        "/api/v1/gardenersByCountry": {
+            "get": {
+                "tags": [
+                    "gardenersByCountry"
+                ],
+                "summary": "Display all gardeners per country and their respective numbers of customers they have each.",
+                "description": "Get all gardeners per country and their respective numbers of  customers they have each",
+                "operationId": "countries",
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+        "/api/v1/gardenersByCountry/{countryId}": {
+            "get": {
+                "tags": [
+                    "gardenersByCountry"
+                ],
+                "summary": "Country of domicile by id and gardeners per country and their respective numbers of  customers they have each",
+                "description": "Get country by id and gardeners per country and their respective numbers of  customers they have each",
+                "operationId": "countriesById",
+                "parameters": [
+                    {
+                        "name": "countryId",
+                        "in": "path",
+                        "description": "ID of country",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": "1"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "404": {
+                        "description": "Gardener with given ID not found"
                     }
                 }
             }
@@ -685,8 +761,8 @@
                 "tags": [
                     "locations"
                 ],
-                "summary": "Display all Location Areas",
-                "description": "Get all location areas",
+                "summary": "Display all Location Areas and their respective customers",
+                "description": "Get all location areas and their respective customers",
                 "operationId": "locations",
                 "responses": {
                     "200": {
@@ -700,8 +776,8 @@
                 "tags": [
                     "locations"
                 ],
-                "summary": "Location Area by id",
-                "description": "Get location area by id",
+                "summary": "Location Area by id and their respective customers",
+                "description": "Get location area by id and their respective customers",
                 "operationId": "locationsById",
                 "parameters": [
                     {
@@ -719,6 +795,9 @@
                 "responses": {
                     "200": {
                         "description": "Success"
+                    },
+                    "404": {
+                        "description": "Location with given ID not found"
                     }
                 }
             }

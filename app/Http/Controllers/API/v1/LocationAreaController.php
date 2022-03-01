@@ -5,14 +5,15 @@ namespace App\Http\Controllers\API\v1;
 use App\Http\Controllers\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\LocationAreas;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class LocationAreaController extends Controller
 {
     /**
      * @OA\Get(
      * path="/api/v1/locations",
-     * summary="Display all Location Areas",
-     * description="Get all location areas",
+     * summary="Display all Location Areas and their respective customers",
+     * description="Get all location areas and their respective customers",
      * operationId="locations",
      * tags={"locations"},
      * @OA\Response(
@@ -24,7 +25,7 @@ class LocationAreaController extends Controller
     public function index()
     {
         try {
-            $locationAreas = LocationAreas::all();
+            $locationAreas = LocationAreas::with(['customers', 'country'])->get();
             return response()->json([
                 'success' => true,
                 'data' => $locationAreas,
@@ -40,8 +41,8 @@ class LocationAreaController extends Controller
     /**
      * @OA\Get(
      * path="/api/v1/locations/{locationId}",
-     * summary="Location Area by id",
-     * description="Get location area by id",
+     * summary="Location Area by id and their respective customers",
+     * description="Get location area by id and their respective customers",
      * operationId="locationsById",
      * tags={"locations"},
      * @OA\Parameter(
@@ -59,17 +60,28 @@ class LocationAreaController extends Controller
      *    response=200,
      *    description="Success",
      *     ),
+     * @OA\Response(
+     *    response=404,
+     *    description="Location with given ID not found",
+     *     ),
      * )
      */
     public function show($id)
     {
         try {
-            $locationArea = LocationAreas::findorFail($id);
+            $locationArea = LocationAreas::with(['customers', 'country'])->where('location_areas.id', $id)->get();
+            if ($locationArea->isEmpty()) throw new ModelNotFoundException;
             return response()->json([
                 'success' => true,
                 'data' => $locationArea,
             ], 200);
         } catch (\Exception $e) {
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json([
+                    'success' => true,
+                    'error' => 'Data not found.'
+                ], Response::HTTP_NOT_FOUND);
+            }
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()

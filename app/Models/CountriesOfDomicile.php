@@ -15,4 +15,24 @@ class CountriesOfDomicile extends Model
      * @var string
      */
     protected $table = 'countries_of_domicile';
+
+    public function locations()
+    {
+        return $this->hasMany(LocationAreas::class, 'country', 'id',);
+    }
+
+    public function customer()
+    {
+        return $this->hasOne(Customers::class, 'country_of_domicile', 'id',);
+    }
+
+    public function customers()
+    {
+        return $this->hasMany(Customers::class, 'country_of_domicile', 'id',);
+    }
+
+    public function gardeners()
+    {
+        return $this->hasMany(Gardeners::class, 'country_of_domicile', 'id',);
+    }
 }

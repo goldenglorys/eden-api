@@ -9,6 +9,8 @@ use App\Models\CountriesOfDomicile;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\QueryException;
+
 
 class GardenerController extends Controller
 {
@@ -28,7 +30,7 @@ class GardenerController extends Controller
     public function index()
     {
         try {
-            $gardeners = Gardeners::all();
+            $gardeners = Gardeners::with(['country', 'location'])->get();
             return response()->json([
                 'success' => true,
                 'data' => $gardeners,
@@ -68,12 +70,13 @@ class GardenerController extends Controller
     public function show($id)
     {
         try {
-            $gardener = Gardeners::findorFail($id);
+            $gardener = Gardeners::with(['country', 'location'])->findorFail($id);
             return response()->json([
                 'success' => true,
                 'data' => $gardener,
             ], 200);
         } catch (\Exception $e) {
+
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()
@@ -106,6 +109,10 @@ class GardenerController extends Controller
      * @OA\Response(
      *    response=400,
      *    description="Bad Request"
+     *     ),
+     @OA\Response(
+     *    response=406,
+     *    description="Not acceptable",
      *     ),
      * @OA\Response(
      *     response=422,
@@ -199,6 +206,12 @@ class GardenerController extends Controller
                     'data' => $gardener,
                 ], Response::HTTP_CREATED);
             } catch (\Exception $e) {
+                if ($e instanceof QueryException) {
+                    return response()->json([
+                        'success' => true,
+                        'error' => 'Gardener with ' . $request->email . ' email aleady exists.'
+                    ], Response::HTTP_NOT_ACCEPTABLE);
+                }
                 return response()->json([
                     'success' => false,
                     'error' => $e->getMessage()
@@ -241,6 +254,14 @@ class GardenerController extends Controller
      * @OA\Response(
      *    response=400,
      *    description="Bad Request"
+     *     ),
+     * @OA\Response(
+     *    response=404,
+     *    description="Gardener with given ID not found",
+     *     ),
+     * @OA\Response(
+     *    response=406,
+     *    description="Not acceptable",
      *     ),
      * @OA\Response(
      *     response=422,
@@ -326,6 +347,15 @@ class GardenerController extends Controller
         if (!empty($getCountry) && !empty($getLocationArea)) {
             $request['location_area'] = $getLocationArea->id;
             $request['country_of_domicile'] = $getCountry->id;
+
+            $getGardener = Gardeners::where('id', $id)->first();
+            if (empty($getGardener)) {
+                return response()->json([
+                    'success' => true,
+                    'error' => 'Data not found.'
+                ], Response::HTTP_NOT_FOUND);
+            };
+
             try {
                 $gardener = Gardeners::where('id', $id)->update($request->all());
                 return response()->json([
@@ -333,6 +363,12 @@ class GardenerController extends Controller
                     'data' => Gardeners::where('id', $id)->first(),
                 ], Response::HTTP_ACCEPTED);
             } catch (\Exception $e) {
+                if ($e instanceof QueryException) {
+                    return response()->json([
+                        'success' => true,
+                        'error' => 'Gardener with ' . $request->email . ' email aleady exists.'
+                    ], Response::HTTP_NOT_ACCEPTABLE);
+                }
                 return response()->json([
                     'success' => false,
                     'error' => $e->getMessage()
@@ -361,11 +397,23 @@ class GardenerController extends Controller
      *          response=204,
      *          description="Successful operation",
      *       ),
+     * @OA\Response(
+     *    response=404,
+     *    description="Gardener with given ID not found",
+     *     ),
      * ),
      * )
      */
     public function destroy($id)
     {
+        $getGardener = Gardeners::where('id', $id)->first();
+        if (empty($getGardener)) {
+            return response()->json([
+                'success' => true,
+                'error' => 'Data not found.'
+            ], Response::HTTP_NOT_FOUND);
+        };
+
         try {
             $gardener = Gardeners::destroy($id);
             return response()->json([

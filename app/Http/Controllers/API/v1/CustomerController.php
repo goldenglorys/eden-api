@@ -10,14 +10,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Gardeners;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 
 class CustomerController extends Controller
 {
     /**
      * @OA\Get(
      * path="/api/v1/customers",
-     * summary="Display all Customers",
-     * description="Get all customers",
+     * summary="Display all Customers and their respective gardener",
+     * description="Get all customers and their respective gardener",
      * operationId="customers",
      * tags={"customers"},
      * @OA\Response(
@@ -29,7 +31,7 @@ class CustomerController extends Controller
     public function index()
     {
         try {
-            $customers = Customers::all();
+            $customers = Customers::with(['gardener', 'country', 'location'])->get();
             return response()->json([
                 'success' => true,
                 'data' => $customers,
@@ -45,14 +47,14 @@ class CustomerController extends Controller
     /**
      * @OA\Get(
      * path="/api/v1/customers/{customerId}",
-     * summary="Customer by id",
-     * description="Get customer by id",
+     * summary="Customer by id and their gardener",
+     * description="Get customer by id and their gardener",
      * operationId="customersById",
      * tags={"customers"},
      * @OA\Parameter(
      *    description="ID of customer",
      *    in="path",
-     *    name="customersId",
+     *    name="customerId",
      *    required=true,
      *    example="1",
      *    @OA\Schema(
@@ -64,17 +66,27 @@ class CustomerController extends Controller
      *    response=200,
      *    description="Success",
      *     ),
+     * @OA\Response(
+     *    response=404,
+     *    description="Customer with given ID not found",
+     *     ),
      * )
      */
     public function show($id)
     {
         try {
-            $customer = Customers::findorFail($id);
+            $customer = Customers::with(['gardener', 'country', 'location'])->findorFail($id);
             return response()->json([
                 'success' => true,
                 'data' => $customer,
             ], 200);
         } catch (\Exception $e) {
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json([
+                    'success' => true,
+                    'error' => 'Data not found.'
+                ], Response::HTTP_NOT_FOUND);
+            }
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()
@@ -107,6 +119,10 @@ class CustomerController extends Controller
      * @OA\Response(
      *    response=400,
      *    description="Bad Request"
+     *     ),
+     @OA\Response(
+     *    response=406,
+     *    description="Not acceptable",
      *     ),
      * @OA\Response(
      *     response=422,
@@ -204,6 +220,12 @@ class CustomerController extends Controller
                     'data' => $customer,
                 ], Response::HTTP_CREATED);
             } catch (\Exception $e) {
+                if ($e instanceof QueryException) {
+                    return response()->json([
+                        'success' => true,
+                        'error' => 'Customer with ' . $request->email . ' email aleady exists.'
+                    ], Response::HTTP_NOT_ACCEPTABLE);
+                }
                 return response()->json([
                     'success' => false,
                     'error' => $e->getMessage()
@@ -246,6 +268,14 @@ class CustomerController extends Controller
      * @OA\Response(
      *    response=400,
      *    description="Bad Request"
+     *     ),
+     * @OA\Response(
+     *    response=404,
+     *    description="Customer with given ID not found",
+     *     ),
+     @OA\Response(
+     *    response=406,
+     *    description="Not acceptable",
      *     ),
      * @OA\Response(
      *     response=422,
@@ -338,7 +368,7 @@ class CustomerController extends Controller
         }
 
         $getGardener = Gardeners::where('id', $request->gardener)->first();
-        if(empty($getGardener)){
+        if (empty($getGardener)) {
             return response()->json([
                 'success' => false,
                 'error' => 'Invalid gardener ID. Please pick from the available gardener in the system'
@@ -350,6 +380,14 @@ class CustomerController extends Controller
             $request['country_of_domicile'] = $getCountry->id;
             $request['gardener'] = $getGardener->id;
 
+            $getCustomer = Customers::where('id', $id)->first();
+            if (empty($getCustomer)) {
+                return response()->json([
+                    'success' => true,
+                    'error' => 'Data not found.'
+                ], Response::HTTP_NOT_FOUND);
+            };
+
             try {
                 $customer = Customers::where('id', $id)->update($request->all());
                 return response()->json([
@@ -357,6 +395,12 @@ class CustomerController extends Controller
                     'data' => Customers::where('id', $id)->first(),
                 ], Response::HTTP_ACCEPTED);
             } catch (\Exception $e) {
+                if ($e instanceof QueryException) {
+                    return response()->json([
+                        'success' => true,
+                        'error' => 'Customer with ' . $request->email . ' email aleady exists.'
+                    ], Response::HTTP_NOT_ACCEPTABLE);
+                }
                 return response()->json([
                     'success' => false,
                     'error' => $e->getMessage()
@@ -385,11 +429,22 @@ class CustomerController extends Controller
      *          response=204,
      *          description="Successful operation",
      *       ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Customer with given ID not found",
+     *     ),
      * ),
      * )
      */
     public function destroy($id)
     {
+        $getCustomer = Customers::where('id', $id)->first();
+        if (empty($getCustomer)) {
+            return response()->json([
+                'success' => true,
+                'error' => 'Data not found.'
+            ], Response::HTTP_NOT_FOUND);
+        };
         try {
             $customer = Customers::destroy($id);
             return response()->json([
